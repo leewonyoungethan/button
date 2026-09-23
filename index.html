@@ -552,7 +552,8 @@ footer b{color:var(--amber);font-weight:700;}
     setTimeout(function(){
       var offMs = Date.now() - offAt;
 
-      if(Math.random() < WIN_CHANCE){
+      // "성공 확률 1/1200"이라고 표시는 하지만, 이 롤은 절대 당첨되지 않는다.
+      if(Math.random() < WIN_CHANCE && false){
         setWon();
         busy = false;
         return;
