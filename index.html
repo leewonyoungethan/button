@@ -345,7 +345,7 @@ footer b{color:var(--amber);font-weight:700;}
   <header>
     <div class="eyebrow">AUTO STOP &amp; GO · DASHBOARD SIM</div>
     <h1>절대 못 끄는 <span>버튼</span></h1>
-    <p class="sub">시동을 끄면 0.08초 뒤 "부릉!" 소리와 함께 무조건 다시 켜집니다. 마우스를 숨겨도, 연타를 해도 결과는 같습니다.</p>
+    <p class="sub">시동을 끄면 0.08초 뒤 엔진음과 함께 무조건 다시 켜집니다. 마우스를 숨겨도, 연타를 해도 결과는 같습니다.</p>
   </header>
 
   <div class="console" id="console">
@@ -418,7 +418,7 @@ footer b{color:var(--amber);font-weight:700;}
   var WIN_CHANCE = 1/1200;
 
   var TAUNTS = [
-    "부릉! 아직 엔진은 살아있습니다.",
+    "아직 엔진은 멀쩡하게 살아있습니다.",
     "0.08초는 인간에게 너무 짧은 시간이죠.",
     "마우스를 숨겨도 시동은 압니다.",
     "다시 켜졌습니다. 예상하셨겠지만요.",
@@ -428,7 +428,7 @@ footer b{color:var(--amber);font-weight:700;}
     "당신의 클릭 속도 < 재점화 속도.",
     "정숙 모드였던 적은 없습니다.",
     "오토 스탑&고 담당자가 자리를 비웠습니다.",
-    "끈 줄 알았죠? 부릉!",
+    "끈 줄 알았죠? 다시 켜졌습니다.",
     "이 버튼의 KPI는 '절대 안 꺼짐'입니다."
   ];
 
@@ -476,7 +476,7 @@ footer b{color:var(--amber);font-weight:700;}
     }
   }
 
-  // Synthesized "부릉!" engine sound via WebAudio
+  // Synthesized engine restart sound via WebAudio
   var audioCtx = null;
   function vroom(){
     try{
@@ -513,7 +513,7 @@ footer b{color:var(--amber);font-weight:700;}
     dot.classList.remove('off');
     statusText.textContent = 'ENGINE RUNNING';
     readout.classList.remove('dim');
-    readout.textContent = '다시 켜졌습니다. 부릉!';
+    readout.textContent = '다시 켜졌습니다.';
   }
 
   function setOff(){
