@@ -642,7 +642,11 @@ footer b{color:var(--amber);font-weight:700;}
   }
 
   btn.addEventListener('click', function(){
-    if(busy || !isOn || won) return;
+    if(won){
+      launchFireworks();
+      return;
+    }
+    if(busy || !isOn) return;
     busy = true;
     attempts += 1;
     try{ localStorage.setItem('asg_attempts', String(attempts)); }catch(e){}
