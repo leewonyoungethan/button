@@ -428,6 +428,8 @@ footer b{color:var(--amber);font-weight:700;}
   <footer>이 페이지의 물리 법칙: <b>모든 OFF는 0.08초짜리 착각</b>입니다.</footer>
 </div>
 
+<canvas id="fx" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:999;"></canvas>
+
 <script>
 (function(){
   var btn = document.getElementById('btn');
@@ -445,6 +447,73 @@ footer b{color:var(--amber);font-weight:700;}
   var retryBtn = document.getElementById('retryBtn');
 
   var WIN_CHANCE = 1/100;
+
+  var fxCanvas = document.getElementById('fx');
+  var fxCtx = fxCanvas.getContext('2d');
+  var fxColors = ['#ffb238','#39d3e0','#39e07a','#ff5a52','#ffffff'];
+  var fxParticles = [];
+  var fxRaf = null;
+
+  function fxResize(){
+    fxCanvas.width = window.innerWidth;
+    fxCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', fxResize);
+
+  function fxBurst(x, y){
+    var count = 46;
+    for(var i=0;i<count;i++){
+      var angle = Math.random()*Math.PI*2;
+      var speed = 2.5 + Math.random()*4.5;
+      fxParticles.push({
+        x:x, y:y,
+        vx:Math.cos(angle)*speed,
+        vy:Math.sin(angle)*speed,
+        life:1,
+        decay:0.010+Math.random()*0.012,
+        color:fxColors[Math.floor(Math.random()*fxColors.length)],
+        size:2+Math.random()*2.4
+      });
+    }
+  }
+
+  function fxTick(){
+    fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+    for(var i=fxParticles.length-1;i>=0;i--){
+      var p = fxParticles[i];
+      p.vy += 0.06;
+      p.vx *= 0.99;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      if(p.life<=0){ fxParticles.splice(i,1); continue; }
+      fxCtx.globalAlpha = Math.max(p.life,0);
+      fxCtx.fillStyle = p.color;
+      fxCtx.beginPath();
+      fxCtx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      fxCtx.fill();
+    }
+    fxCtx.globalAlpha = 1;
+    if(fxParticles.length>0){
+      fxRaf = requestAnimationFrame(fxTick);
+    } else {
+      fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+      fxRaf = null;
+    }
+  }
+
+  function launchFireworks(){
+    fxResize();
+    var w = fxCanvas.width, h = fxCanvas.height;
+    for(var b=0; b<5; b++){
+      (function(idx){
+        setTimeout(function(){
+          fxBurst(w*(0.2+Math.random()*0.6), h*(0.18+Math.random()*0.32));
+        }, idx*200);
+      })(b);
+    }
+    if(!fxRaf) fxRaf = requestAnimationFrame(fxTick);
+  }
 
   var TAUNTS = [
     "아직 엔진은 멀쩡하게 살아있습니다.",
@@ -566,6 +635,7 @@ footer b{color:var(--amber);font-weight:700;}
     readout.textContent = '정말로 꺼졌습니다. 1/100의 기적입니다.';
     taunt.textContent = '축하합니다. 이 버튼을 진짜로 이겼습니다.';
     retryBtn.hidden = false;
+    launchFireworks();
   }
 
   btn.addEventListener('click', function(){
