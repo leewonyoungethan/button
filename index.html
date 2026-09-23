@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>절대 못 끄는 버튼</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#0b0d10;
+  --bg2:#111417;
+  --panel:#161a1e;
+  --panel-edge:#242a30;
+  --dial:#1c2126;
+  --text:#e9ebec;
+  --muted:#7d868d;
+  --amber:#ffb238;
+  --amber-dim:#4a3a1e;
+  --green:#39e07a;
+  --green-dim:#1f4a34;
+  --red:#ff5a52;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, #1a1f24 0%, var(--bg) 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR', system-ui, sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:28px 16px 36px;
+  overflow-x:hidden;
+}
+
+.wrap{
+  width:100%;
+  max-width:460px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  align-items:stretch;
+}
+
+header{
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.eyebrow{
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  letter-spacing:.22em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+h1{
+  font-family:'Orbitron', 'Noto Sans KR', sans-serif;
+  font-weight:900;
+  font-size:clamp(22px,7vw,30px);
+  margin:0;
+  letter-spacing:.01em;
+  text-wrap:balance;
+  color:var(--text);
+}
+h1 span{color:var(--amber);}
+.sub{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.55;
+  margin:0 auto;
+  max-width:340px;
+}
+
+.console{
+  background:linear-gradient(180deg,var(--panel) 0%, var(--bg2) 100%);
+  border:1px solid var(--panel-edge);
+  border-radius:22px;
+  padding:26px 22px 22px;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.03);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+}
+
+.status-row{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.status-row .live{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  transition:background .15s, box-shadow .15s;
+}
+.dot.off{background:var(--red);box-shadow:0 0 8px var(--red);}
+
+.stage{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/0.72;
+  max-height:230px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.btn-shell{
+  position:relative;
+  width:132px;
+  height:132px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #2a3138, var(--dial) 60%, #0d0f11 100%);
+  border:1px solid #30373d;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:
+    0 14px 28px -10px rgba(0,0,0,.75),
+    inset 0 2px 4px rgba(255,255,255,.06),
+    inset 0 -6px 14px rgba(0,0,0,.5);
+}
+
+button.core{
+  all:unset;
+  cursor:pointer;
+  width:104px;
+  height:104px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at 38% 30%, #23282d, #15181b 70%);
+  border:1px solid #383f46;
+  transition:transform .08s ease, box-shadow .25s ease, background .25s ease;
+  box-shadow:0 0 0 0 rgba(255,178,56,0);
+}
+button.core:active{transform:scale(.94);}
+button.core:focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+
+button.core.is-on{
+  box-shadow:0 0 22px 2px rgba(57,224,122,.35), inset 0 0 12px rgba(57,224,122,.12);
+}
+button.core.is-off{
+  background:radial-gradient(circle at 38% 30%, #1a1d20, #0d0f11 70%);
+  box-shadow:none;
+}
+button.core.is-off .icon-a, button.core.is-off .icon-arrow{
+  stroke:#4b5157;
+  opacity:.55;
+}
+button.core.is-on .icon-a, button.core.is-on .icon-arrow{
+  stroke:var(--green);
+  filter:drop-shadow(0 0 4px rgba(57,224,122,.7));
+}
+
+.icon-a{
+  fill:none;
+  stroke-width:6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition:stroke .2s, filter .2s, opacity .2s;
+}
+.icon-arrow{
+  fill:none;
+  stroke-width:3.4;
+  stroke-linecap:round;
+  transition:stroke .2s, filter .2s, opacity .2s;
+}
+
+@keyframes relight{
+  0%{transform:scale(1);}
+  30%{transform:scale(1.16);}
+  55%{transform:scale(.92);}
+  100%{transform:scale(1);}
+}
+.core.pulse{animation:relight .38s ease;}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-4px);}
+  40%{transform:translateX(4px);}
+  60%{transform:translateX(-3px);}
+  80%{transform:translateX(3px);}
+}
+.console.shake{animation:shake .32s ease;}
+
+.readout{
+  min-height:20px;
+  font-family:'Share Tech Mono', monospace;
+  font-size:13px;
+  letter-spacing:.03em;
+  color:var(--amber);
+  text-align:center;
+  transition:opacity .15s;
+}
+.readout.dim{color:var(--muted);}
+
+.taunt{
+  width:100%;
+  text-align:center;
+  font-size:14.5px;
+  font-weight:700;
+  color:var(--text);
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 6px;
+  line-height:1.4;
+}
+
+.stats{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.tile{
+  background:var(--bg2);
+  border:1px solid var(--panel-edge);
+  border-radius:12px;
+  padding:12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.tile .k{
+  font-size:10.5px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.tile .v{
+  font-family:'Share Tech Mono', monospace;
+  font-size:22px;
+  color:var(--text);
+  font-variant-numeric:tabular-nums;
+}
+.tile .v.amber{color:var(--amber);}
+
+.log{
+  width:100%;
+  max-height:150px;
+  overflow-y:auto;
+  border:1px solid var(--panel-edge);
+  border-radius:12px;
+  background:var(--bg2);
+}
+.log-head{
+  font-family:'Share Tech Mono', monospace;
+  font-size:10.5px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:10px 14px 6px;
+}
+.log-list{
+  list-style:none;
+  margin:0;
+  padding:0 14px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.log-list li{
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  border-bottom:1px dashed #1f242a;
+  padding-bottom:6px;
+}
+.log-list li:last-child{border-bottom:none;padding-bottom:0;}
+.log-list li .n{color:var(--amber);}
+.log-empty{
+  font-size:12px;
+  color:var(--muted);
+  padding:0 14px 12px;
+  font-family:'Noto Sans KR', sans-serif;
+}
+
+.retry{
+  all:unset;
+  cursor:pointer;
+  align-self:center;
+  padding:9px 20px;
+  border-radius:999px;
+  background:var(--amber);
+  color:#1a1300;
+  font-family:'Noto Sans KR', sans-serif;
+  font-weight:700;
+  font-size:13px;
+}
+.retry:hover{filter:brightness(1.06);}
+.retry:focus-visible{outline:2px solid var(--text); outline-offset:3px;}
+
+.won .btn-shell{
+  box-shadow:
+    0 14px 28px -10px rgba(0,0,0,.75),
+    0 0 0 6px rgba(255,178,56,.18);
+}
+.core.is-won{
+  background:radial-gradient(circle at 38% 30%, #23282d, #15181b 70%);
+  box-shadow:0 0 30px 4px rgba(255,178,56,.55), inset 0 0 14px rgba(255,178,56,.25);
+}
+.core.is-won .icon-a, .core.is-won .icon-arrow{
+  stroke:var(--amber);
+  filter:drop-shadow(0 0 6px rgba(255,178,56,.85));
+}
+
+footer{
+  text-align:center;
+  font-size:11.5px;
+  color:var(--muted);
+  line-height:1.6;
+}
+footer b{color:var(--amber);font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">AUTO STOP &amp; GO · DASHBOARD SIM</div>
+    <h1>절대 못 끄는 <span>버튼</span></h1>
+    <p class="sub">시동을 끄면 0.08초 뒤 "부릉!" 소리와 함께 무조건 다시 켜집니다. 마우스를 숨겨도, 연타를 해도 결과는 같습니다.</p>
+  </header>
+
+  <div class="console" id="console">
+    <div class="status-row">
+      <div class="live"><span class="dot" id="dot"></span><span id="statusText">ENGINE RUNNING</span></div>
+      <span id="clock">00:00:00</span>
+    </div>
+
+    <div class="stage">
+      <div class="btn-shell">
+        <button class="core is-on" id="btn" aria-label="오토 스탑앤고 버튼">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <path class="icon-arrow" d="M26 4 A22 22 0 1 1 6.5 16" />
+            <polygon class="icon-arrow" points="4,6 9,17 -2,17" transform="translate(8 0)" style="fill:currentColor;stroke:none;" />
+            <text x="26" y="33" text-anchor="middle" font-family="Orbitron, sans-serif" font-size="20" font-weight="700" fill="currentColor" class="icon-a" style="stroke:none;">A</text>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="readout" id="readout">클릭해서 시동을 꺼보세요</div>
+    <div class="taunt" id="taunt"></div>
+    <button class="retry" id="retryBtn" hidden>다시 도전하기</button>
+  </div>
+
+  <div class="stats">
+    <div class="tile">
+      <div class="k">패배 횟수</div>
+      <div class="v amber" id="failCount">0</div>
+    </div>
+    <div class="tile">
+      <div class="k">최단 저항 시간</div>
+      <div class="v" id="bestTime">–</div>
+    </div>
+    <div class="tile">
+      <div class="k">성공 확률</div>
+      <div class="v" id="oddsTile">1 / 1200</div>
+    </div>
+    <div class="tile">
+      <div class="k">누적 시도</div>
+      <div class="v" id="attemptCount">0</div>
+    </div>
+  </div>
+
+  <div class="log">
+    <div class="log-head">시동 기록</div>
+    <ul class="log-list" id="logList"></ul>
+    <div class="log-empty" id="logEmpty">아직 기록이 없습니다. 버튼을 눌러보세요.</div>
+  </div>
+
+  <footer>이 페이지의 물리 법칙: <b>모든 OFF는 0.08초짜리 착각</b>입니다.</footer>
+</div>
+
+<script>
+(function(){
+  var btn = document.getElementById('btn');
+  var consoleEl = document.getElementById('console');
+  var dot = document.getElementById('dot');
+  var statusText = document.getElementById('statusText');
+  var readout = document.getElementById('readout');
+  var taunt = document.getElementById('taunt');
+  var failCountEl = document.getElementById('failCount');
+  var bestTimeEl = document.getElementById('bestTime');
+  var logList = document.getElementById('logList');
+  var logEmpty = document.getElementById('logEmpty');
+  var clockEl = document.getElementById('clock');
+  var attemptCountEl = document.getElementById('attemptCount');
+  var retryBtn = document.getElementById('retryBtn');
+
+  var WIN_CHANCE = 1/1200;
+
+  var TAUNTS = [
+    "부릉! 아직 엔진은 살아있습니다.",
+    "0.08초는 인간에게 너무 짧은 시간이죠.",
+    "마우스를 숨겨도 시동은 압니다.",
+    "다시 켜졌습니다. 예상하셨겠지만요.",
+    "이 버튼은 물리 법칙 위에 있습니다.",
+    "연타는 통계적으로 무의미합니다.",
+    "엔진: \"나 안 꺼져요.\"",
+    "당신의 클릭 속도 < 재점화 속도.",
+    "정숙 모드였던 적은 없습니다.",
+    "오토 스탑&고 담당자가 자리를 비웠습니다.",
+    "끈 줄 알았죠? 부릉!",
+    "이 버튼의 KPI는 '절대 안 꺼짐'입니다."
+  ];
+
+  var failCount = 0;
+  var attempts = 0;
+  var bestMs = null;
+  var startedAt = Date.now();
+  var isOn = true;
+  var busy = false;
+  var won = false;
+
+  try{
+    var savedFail = localStorage.getItem('asg_fail');
+    var savedBest = localStorage.getItem('asg_best');
+    var savedAttempts = localStorage.getItem('asg_attempts');
+    if(savedFail) failCount = parseInt(savedFail,10) || 0;
+    if(savedBest) bestMs = parseFloat(savedBest) || null;
+    if(savedAttempts) attempts = parseInt(savedAttempts,10) || 0;
+  }catch(e){}
+
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function tickClock(){
+    var s = Math.floor((Date.now()-startedAt)/1000);
+    var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    clockEl.textContent = pad(h)+':'+pad(m)+':'+pad(sec);
+  }
+  setInterval(tickClock, 1000);
+
+  function renderStats(){
+    failCountEl.textContent = failCount;
+    bestTimeEl.textContent = bestMs !== null ? (bestMs/1000).toFixed(3)+'초' : '–';
+    attemptCountEl.textContent = attempts;
+  }
+  renderStats();
+
+  function addLog(offMs){
+    logEmpty.hidden = true;
+    var li = document.createElement('li');
+    var now = new Date();
+    var t = pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+    li.innerHTML = '<span>#'+ '<span class="n">'+failCount+'</span>' +' · '+t+'</span><span>재점화 '+(offMs/1000).toFixed(3)+'s</span>';
+    logList.insertBefore(li, logList.firstChild);
+    while(logList.children.length > 12){
+      logList.removeChild(logList.lastChild);
+    }
+  }
+
+  // Synthesized "부릉!" engine sound via WebAudio
+  var audioCtx = null;
+  function vroom(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      var t0 = audioCtx.currentTime;
+
+      // soft rounded "boop-woop" instead of a harsh engine rasp
+      var osc = audioCtx.createOscillator();
+      osc.type = 'triangle';
+      var g = audioCtx.createGain();
+      osc.frequency.setValueAtTime(220, t0);
+      osc.frequency.exponentialRampToValueAtTime(440, t0+0.08);
+      osc.frequency.exponentialRampToValueAtTime(330, t0+0.22);
+
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.linearRampToValueAtTime(0.18, t0+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+0.24);
+
+      var lp = audioCtx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(2200, t0);
+
+      osc.connect(lp); lp.connect(g); g.connect(audioCtx.destination);
+      osc.start(t0);
+      osc.stop(t0+0.26);
+    }catch(e){}
+  }
+
+  function setOn(){
+    isOn = true;
+    btn.classList.remove('is-off');
+    btn.classList.add('is-on');
+    dot.classList.remove('off');
+    statusText.textContent = 'ENGINE RUNNING';
+    readout.classList.remove('dim');
+    readout.textContent = '다시 켜졌습니다. 부릉!';
+  }
+
+  function setOff(){
+    isOn = false;
+    btn.classList.remove('is-on');
+    btn.classList.add('is-off');
+    dot.classList.add('off');
+    statusText.textContent = 'ENGINE OFF';
+    readout.classList.add('dim');
+    readout.textContent = '재점화까지 0.08초…';
+  }
+
+  function setWon(){
+    won = true;
+    btn.classList.remove('is-on','is-off');
+    btn.classList.add('is-won');
+    consoleEl.classList.add('won');
+    dot.classList.remove('off');
+    statusText.textContent = 'ENGINE OFF · CONFIRMED';
+    readout.classList.remove('dim');
+    readout.textContent = '정말로 꺼졌습니다. 1/1200의 기적입니다.';
+    taunt.textContent = '축하합니다. 이 버튼을 진짜로 이겼습니다.';
+    retryBtn.hidden = false;
+  }
+
+  btn.addEventListener('click', function(){
+    if(busy || !isOn || won) return;
+    busy = true;
+    attempts += 1;
+    try{ localStorage.setItem('asg_attempts', String(attempts)); }catch(e){}
+    renderStats();
+
+    var offAt = Date.now();
+    setOff();
+
+    setTimeout(function(){
+      var offMs = Date.now() - offAt;
+
+      if(Math.random() < WIN_CHANCE){
+        setWon();
+        busy = false;
+        return;
+      }
+
+      setOn();
+      vroom();
+
+      btn.classList.remove('pulse');
+      void btn.offsetWidth;
+      btn.classList.add('pulse');
+
+      consoleEl.classList.remove('shake');
+      void consoleEl.offsetWidth;
+      consoleEl.classList.add('shake');
+
+      failCount += 1;
+      if(bestMs === null || offMs < bestMs) bestMs = offMs;
+      try{
+        localStorage.setItem('asg_fail', String(failCount));
+        localStorage.setItem('asg_best', String(bestMs));
+      }catch(e){}
+      renderStats();
+      addLog(offMs);
+
+      taunt.textContent = TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
+
+      busy = false;
+    }, 80);
+  });
+
+  retryBtn.addEventListener('click', function(){
+    won = false;
+    retryBtn.hidden = true;
+    consoleEl.classList.remove('won');
+    btn.classList.remove('is-won');
+    setOn();
+    readout.textContent = '다시 도전해보세요.';
+    taunt.textContent = '';
+  });
+})();
+</script>
+</body>
+</html>
