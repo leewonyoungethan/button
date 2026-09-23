@@ -411,7 +411,7 @@ footer b{color:var(--amber);font-weight:700;}
     </div>
     <div class="tile">
       <div class="k">성공 확률</div>
-      <div class="v" id="oddsTile">1 / 1000</div>
+      <div class="v" id="oddsTile">1 / 100</div>
     </div>
     <div class="tile">
       <div class="k">누적 시도</div>
@@ -444,7 +444,7 @@ footer b{color:var(--amber);font-weight:700;}
   var attemptCountEl = document.getElementById('attemptCount');
   var retryBtn = document.getElementById('retryBtn');
 
-  var WIN_CHANCE = 1/1000;
+  var WIN_CHANCE = 1/100;
 
   var TAUNTS = [
     "아직 엔진은 멀쩡하게 살아있습니다.",
@@ -563,7 +563,7 @@ footer b{color:var(--amber);font-weight:700;}
     dot.classList.remove('off');
     statusText.textContent = 'ENGINE OFF · CONFIRMED';
     readout.classList.remove('dim');
-    readout.textContent = '정말로 꺼졌습니다. 1/1000의 기적입니다.';
+    readout.textContent = '정말로 꺼졌습니다. 1/100의 기적입니다.';
     taunt.textContent = '축하합니다. 이 버튼을 진짜로 이겼습니다.';
     retryBtn.hidden = false;
   }
