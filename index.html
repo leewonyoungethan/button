@@ -402,8 +402,8 @@ footer b{color:var(--amber);font-weight:700;}
 
   <div class="stats">
     <div class="tile">
-      <div class="k">패배 횟수</div>
-      <div class="v amber" id="failCount">0</div>
+      <div class="k">성공 횟수</div>
+      <div class="v amber" id="winCount">0</div>
     </div>
     <div class="tile">
       <div class="k">최단 저항 시간</div>
@@ -438,7 +438,7 @@ footer b{color:var(--amber);font-weight:700;}
   var statusText = document.getElementById('statusText');
   var readout = document.getElementById('readout');
   var taunt = document.getElementById('taunt');
-  var failCountEl = document.getElementById('failCount');
+  var winCountEl = document.getElementById('winCount');
   var bestTimeEl = document.getElementById('bestTime');
   var logList = document.getElementById('logList');
   var logEmpty = document.getElementById('logEmpty');
@@ -531,6 +531,7 @@ footer b{color:var(--amber);font-weight:700;}
   ];
 
   var failCount = 0;
+  var winCount = 0;
   var attempts = 0;
   var bestMs = null;
   var startedAt = Date.now();
@@ -540,9 +541,11 @@ footer b{color:var(--amber);font-weight:700;}
 
   try{
     var savedFail = localStorage.getItem('asg_fail');
+    var savedWin = localStorage.getItem('asg_win');
     var savedBest = localStorage.getItem('asg_best');
     var savedAttempts = localStorage.getItem('asg_attempts');
     if(savedFail) failCount = parseInt(savedFail,10) || 0;
+    if(savedWin) winCount = parseInt(savedWin,10) || 0;
     if(savedBest) bestMs = parseFloat(savedBest) || null;
     if(savedAttempts) attempts = parseInt(savedAttempts,10) || 0;
   }catch(e){}
@@ -556,7 +559,7 @@ footer b{color:var(--amber);font-weight:700;}
   setInterval(tickClock, 1000);
 
   function renderStats(){
-    failCountEl.textContent = failCount;
+    winCountEl.textContent = winCount;
     bestTimeEl.textContent = bestMs !== null ? (bestMs/1000).toFixed(3)+'초' : '–';
     attemptCountEl.textContent = attempts;
   }
@@ -652,6 +655,9 @@ footer b{color:var(--amber);font-weight:700;}
       var offMs = Date.now() - offAt;
 
       if(Math.random() < WIN_CHANCE){
+        winCount += 1;
+        try{ localStorage.setItem('asg_win', String(winCount)); }catch(e){}
+        renderStats();
         setWon();
         busy = false;
         return;
